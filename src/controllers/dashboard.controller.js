@@ -27,70 +27,123 @@ function kitchenLoadFromCount(count) {
   return 'LOW';
 }
 
+function addWarning(warnings, moduleName, resp) {
+  if (!resp || resp.ok) return;
+  warnings.push({
+    module: moduleName,
+    status: resp.status,
+    message: resp?.error?.message || 'Upstream returned non-2xx response',
+  });
+}
+
+async function settle(moduleName, promise, warnings) {
+  try {
+    const value = await promise;
+    addWarning(warnings, moduleName, value);
+    return value;
+  } catch (err) {
+    warnings.push({
+      module: moduleName,
+      status: 0,
+      message: err?.message || 'Upstream request failed',
+    });
+    return { ok: false, status: 0, data: null, error: { message: err?.message, code: err?.code } };
+  }
+}
+
 const dashboardController = {
   async overview(req, res, next) {
     try {
       const date = req.query.date;
       const { startIso, endIso } = getDayRangeIso({ timezone: config.timezone, date });
 
-      const [
-        dpDelivered,
-        atcClosed,
-        queuePending,
-        dpActive,
-        atcActiveClients,
-        lowStock,
-        dpAlerts,
-      ] = await Promise.all([
-        fetchJsonCached({
-          baseURL: config.dpBaseUrl,
-          path: '/api/dp/v1/orders',
-          params: { status: 'DELIVERED', date: date || 'today' },
-          requestId: req.id,
-          fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: date || 'today', requestId }),
-        }),
-        fetchJsonCached({
-          baseURL: config.atcBaseUrl,
-          path: '/api/v1/atencion-cliente/clients',
-          params: { status: 'CLOSED', date_from: startIso, date_to: endIso },
-          requestId: req.id,
-          fetcher: ({ requestId }) => atc.getClosedClients({ dateFrom: startIso, dateTo: endIso, requestId }),
-        }),
-        fetchJsonCached({
-          baseURL: config.cocinaBaseUrl,
-          path: '/kds/queue',
-          params: { status: 'PENDING' },
-          requestId: req.id,
-          fetcher: ({ requestId }) => cocina.getKdsQueue({ status: 'PENDING', requestId }),
-        }),
-        fetchJsonCached({
-          baseURL: config.dpBaseUrl,
-          path: '/api/dp/v1/orders/active',
-          params: {},
-          requestId: req.id,
-          fetcher: ({ requestId }) => dp.getActiveOrders({ requestId }),
-        }),
-        fetchJsonCached({
-          baseURL: config.atcBaseUrl,
-          path: '/api/v1/atencion-cliente/clients/active',
-          params: {},
-          requestId: req.id,
-          fetcher: ({ requestId }) => atc.getActiveClients({ requestId }),
-        }),
-        fetchJsonCached({
-          baseURL: config.cocinaBaseUrl,
-          path: '/inventory/items',
-          params: { stockStatus: 'LOW' },
-          requestId: req.id,
-          fetcher: ({ requestId }) => cocina.getInventoryLow({ requestId }),
-        }),
-        fetchJsonCached({
-          baseURL: config.dpBaseUrl,
-          path: '/api/dp/v1/alerts',
-          params: {},
-          requestId: req.id,
-          fetcher: ({ requestId }) => dp.getAlerts({ requestId }),
-        }),
+      const warnings = [];
+
+      const [dpDelivered, atcClosed, queuePending, dpActive, atcActiveClients, lowStock, dpAlerts] = await Promise.all([
+        settle(
+          'dp_orders_delivered',
+          fetchJsonCached({
+            baseURL: config.dpBaseUrl,
+            path: '/api/dp/v1/orders',
+            params: { status: 'DELIVERED', date: date || 'today' },
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: date || 'today', requestId }),
+          }),
+          warnings
+        ),
+        settle(
+          'atc_clients_closed',
+          fetchJsonCached({
+            baseURL: config.atcBaseUrl,
+            path: '/api/v1/atencion-cliente/clients',
+            params: { status: 'CLOSED', date_from: startIso, date_to: endIso },
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => atc.getClosedClients({ dateFrom: startIso, dateTo: endIso, requestId }),
+          }),
+          warnings
+        ),
+        settle(
+          'cocina_queue_pending',
+          fetchJsonCached({
+            baseURL: config.cocinaBaseUrl,
+            path: '/kds/queue',
+            params: { status: 'PENDING' },
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => cocina.getKdsQueue({ status: 'PENDING', requestId }),
+          }),
+          warnings
+        ),
+        settle(
+          'dp_orders_active',
+          fetchJsonCached({
+            baseURL: config.dpBaseUrl,
+            path: '/api/dp/v1/orders/active',
+            params: {},
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => dp.getActiveOrders({ requestId }),
+          }),
+          warnings
+        ),
+        settle(
+          'atc_clients_active',
+          fetchJsonCached({
+            baseURL: config.atcBaseUrl,
+            path: '/api/v1/atencion-cliente/clients/active',
+            params: {},
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => atc.getActiveClients({ requestId }),
+          }),
+          warnings
+        ),
+        settle(
+          'cocina_low_stock',
+          fetchJsonCached({
+            baseURL: config.cocinaBaseUrl,
+            path: '/inventory/items',
+            params: { stockStatus: 'LOW' },
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => cocina.getInventoryLow({ requestId }),
+          }),
+          warnings
+        ),
+        settle(
+          'dp_alerts',
+          fetchJsonCached({
+            baseURL: config.dpBaseUrl,
+            path: '/api/dp/v1/alerts',
+            params: {},
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => dp.getAlerts({ requestId }),
+          }),
+          warnings
+        ),
       ]);
 
       const dpOrders = asArray(dpDelivered.data);
@@ -122,6 +175,7 @@ const dashboardController = {
 
       res.json({
         date_range: { start: startIso, end: endIso },
+        warnings,
         financial_summary: {
           daily_revenue: {
             total: totalRevenue,

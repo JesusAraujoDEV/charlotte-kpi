@@ -24,6 +24,7 @@ const operationsController = {
         path: '/kds/history',
         params: { status: 'SERVED', startDate: startIso },
         requestId: req.id,
+        ttlMs: 5_000,
         fetcher: ({ requestId }) => cocina.getKdsHistory({ status: 'SERVED', startDate: startIso, requestId }),
       });
 
@@ -57,6 +58,7 @@ const operationsController = {
         path: '/api/dp/v1/dashboard/orders',
         params: {},
         requestId: req.id,
+        ttlMs: 5_000,
         fetcher: ({ requestId }) => dp.getDashboardOrders({ requestId }),
       });
 
@@ -102,6 +104,7 @@ const operationsController = {
         path: '/api/dp/v1/alerts',
         params: {},
         requestId: req.id,
+        ttlMs: 5_000,
         fetcher: ({ requestId }) => dp.getAlerts({ requestId }),
       });
 

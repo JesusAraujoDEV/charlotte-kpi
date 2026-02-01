@@ -11,6 +11,7 @@ const inventoryController = {
         path: '/inventory/items',
         params: { stockStatus: 'LOW' },
         requestId: req.id,
+        ttlMs: 30_000,
         fetcher: ({ requestId }) => cocina.getInventoryLow({ requestId }),
       });
 
@@ -44,6 +45,7 @@ const inventoryController = {
         path: '/inventory/items',
         params: { stockStatus: 'LOW' },
         requestId: req.id,
+        ttlMs: 30_000,
         fetcher: ({ requestId }) => cocina.getInventoryLow({ requestId }),
       });
 
@@ -56,6 +58,7 @@ const inventoryController = {
             path: `/inventory/items/${encodeURIComponent(it?.id ?? it?._id)}/logs`,
             params: {},
             requestId: req.id,
+            ttlMs: 30_000,
             fetcher: ({ requestId }) => cocina.getInventoryItemLogs({ id: it?.id ?? it?._id, requestId }),
           })
         )

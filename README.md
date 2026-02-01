@@ -33,10 +33,32 @@ npm install
 npm run dev
 ```
 
+Por defecto levanta en el puerto `8005` (configurable con `PORT`).
+
 Healthcheck:
 
 ```bash
-curl http://localhost:3000/healthz
+curl http://localhost:8005/healthz
+```
+
+## Docker (Dokploy)
+
+Build:
+
+```bash
+docker build -t charlotte-kpi:latest .
+```
+
+Run (mapea 8005):
+
+```bash
+docker run --rm -p 8005:8005 \
+	-e PORT=8005 \
+	-e DP_URL=https://delivery.irissoftware.lat/ \
+	-e ATC_URL=https://charlotte-atencion-cliente.onrender.com/ \
+	-e COCINA_URL=https://charlotte-cocina.onrender.com/ \
+	-e SEGURIDAD_URL=https://charlotte-seguridad.onrender.com/ \
+	charlotte-kpi:latest
 ```
 
 ## Endpoints (KPI & Analytics)

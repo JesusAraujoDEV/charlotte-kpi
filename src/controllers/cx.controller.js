@@ -18,6 +18,7 @@ const cxController = {
         path: '/api/v1/atencion-cliente/service-requests',
         params: {},
         requestId: req.id,
+        ttlMs: 5_000,
         fetcher: ({ requestId }) => atc.getServiceRequests({ requestId }),
       });
 
@@ -57,6 +58,7 @@ const cxController = {
           path: '/api/v1/atencion-cliente/tables',
           params: { status: 'OCCUPIED' },
           requestId: req.id,
+          ttlMs: 5_000,
           fetcher: ({ requestId }) => atc.getTables({ status: 'OCCUPIED', requestId }),
         }),
         fetchJsonCached({
@@ -64,6 +66,7 @@ const cxController = {
           path: '/api/v1/atencion-cliente/tables',
           params: {},
           requestId: req.id,
+          ttlMs: 5_000,
           fetcher: ({ requestId }) => atc.getTables({ status: undefined, requestId }),
         }),
       ]);
@@ -97,6 +100,7 @@ const cxController = {
         path: '/api/v1/atencion-cliente/clients/active',
         params: {},
         requestId: req.id,
+        ttlMs: 5_000,
         fetcher: ({ requestId }) => atc.getActiveClients({ requestId }),
       });
 

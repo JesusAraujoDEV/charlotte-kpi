@@ -32,6 +32,7 @@ const productController = {
         path: '/kds/history',
         params: { startDate: startIso },
         requestId: req.id,
+        ttlMs: 60_000,
         fetcher: ({ requestId }) => cocina.getKdsHistory({ status: undefined, startDate: startIso, requestId }),
       });
 
@@ -73,6 +74,7 @@ const productController = {
         path: '/products',
         params: { activeOnly: 'false' },
         requestId: req.id,
+        ttlMs: 60_000,
         fetcher: ({ requestId }) => cocina.getProducts({ activeOnly: false, requestId }),
       });
 

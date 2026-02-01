@@ -17,7 +17,7 @@ function required(name) {
 }
 
 const config = {
-  port: Number(process.env.PORT || 3000),
+  port: Number(process.env.PORT || 8005),
   timezone: process.env.TIMEZONE || 'UTC',
   cacheTtlMs: Number(process.env.CACHE_TTL_MS || 15000),
   httpTimeoutMs: Number(process.env.HTTP_TIMEOUT_MS || 10000),

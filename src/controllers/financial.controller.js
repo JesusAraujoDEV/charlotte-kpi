@@ -58,6 +58,7 @@ const financialController = {
           path: '/api/dp/v1/orders',
           params: { status: 'DELIVERED', date: date || 'today' },
           requestId: req.id,
+          ttlMs: 60_000,
           fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: date || 'today', requestId }),
         }),
         fetchJsonCached({
@@ -65,6 +66,7 @@ const financialController = {
           path: '/api/v1/atencion-cliente/clients',
           params: { status: 'CLOSED', date_from: startIso, date_to: endIso },
           requestId: req.id,
+          ttlMs: 60_000,
           fetcher: ({ requestId }) => atc.getClosedClients({ dateFrom: startIso, dateTo: endIso, requestId }),
         }),
       ]);
@@ -103,6 +105,7 @@ const financialController = {
           path: '/api/dp/v1/orders',
           params: { status: 'DELIVERED', date: date || 'today' },
           requestId: req.id,
+          ttlMs: 60_000,
           fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: date || 'today', requestId }),
         }),
         fetchJsonCached({
@@ -110,6 +113,7 @@ const financialController = {
           path: '/api/v1/atencion-cliente/clients',
           params: { status: 'CLOSED', date_from: startIso, date_to: endIso },
           requestId: req.id,
+          ttlMs: 60_000,
           fetcher: ({ requestId }) => atc.getClosedClients({ dateFrom: startIso, dateTo: endIso, requestId }),
         }),
       ]);
@@ -148,6 +152,7 @@ const financialController = {
           path: '/api/dp/v1/orders',
           params: { status: 'CANCELLED', date: date || 'today' },
           requestId: req.id,
+          ttlMs: 60_000,
           fetcher: ({ requestId }) => dp.getOrders({ status: 'CANCELLED', date: date || 'today', requestId }),
         }),
         fetchJsonCached({
@@ -155,6 +160,7 @@ const financialController = {
           path: '/kds/history',
           params: { status: 'REJECTED', startDate: startIso },
           requestId: req.id,
+          ttlMs: 60_000,
           fetcher: ({ requestId }) => cocina.getKdsHistory({ status: 'REJECTED', startDate: startIso, requestId }),
         }),
       ]);

@@ -18,6 +18,7 @@ const workforceController = {
           path: '/staff/active',
           params: {},
           requestId: req.id,
+          ttlMs: 5_000,
           fetcher: ({ requestId }) => cocina.getActiveStaff({ requestId }),
         }),
         fetchJsonCached({
@@ -25,6 +26,7 @@ const workforceController = {
           path: '/kds/queue',
           params: { status: 'PENDING' },
           requestId: req.id,
+          ttlMs: 5_000,
           fetcher: ({ requestId }) => cocina.getKdsQueue({ status: 'PENDING', requestId }),
         }),
         // Best-effort: some implementations may use COOKING / IN_PROGRESS.
@@ -33,6 +35,7 @@ const workforceController = {
           path: '/kds/queue',
           params: { status: 'COOKING' },
           requestId: req.id,
+          ttlMs: 5_000,
           fetcher: ({ requestId }) => cocina.getKdsQueue({ status: 'COOKING', requestId }),
         }),
       ]);
