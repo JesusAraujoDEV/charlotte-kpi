@@ -1,0 +1,50 @@
+const { config } = require('../config');
+const { createHttpClient, httpGetJson } = require('../lib/http');
+
+const dpClient = createHttpClient({ baseURL: config.dpBaseUrl });
+
+async function getOrders({ status, date, requestId }) {
+  return httpGetJson({
+    client: dpClient,
+    path: '/api/dp/v1/orders',
+    params: {
+      status,
+      date,
+    },
+    requestId,
+  });
+}
+
+async function getDashboardOrders({ requestId }) {
+  return httpGetJson({
+    client: dpClient,
+    path: '/api/dp/v1/dashboard/orders',
+    params: {},
+    requestId,
+  });
+}
+
+async function getAlerts({ requestId }) {
+  return httpGetJson({
+    client: dpClient,
+    path: '/api/dp/v1/alerts',
+    params: {},
+    requestId,
+  });
+}
+
+async function getActiveOrders({ requestId }) {
+  return httpGetJson({
+    client: dpClient,
+    path: '/api/dp/v1/orders/active',
+    params: {},
+    requestId,
+  });
+}
+
+module.exports = {
+  getOrders,
+  getDashboardOrders,
+  getAlerts,
+  getActiveOrders,
+};
