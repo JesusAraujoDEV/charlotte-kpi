@@ -4,13 +4,13 @@ const { createHttpClient, httpGetJson } = require('../lib/http');
 const cocinaClient = createHttpClient({ baseURL: config.cocinaBaseUrl });
 
 async function getKdsHistory({ status, startDate, requestId }) {
+  const params = { startDate };
+  if (status) params.status = status;
+
   return httpGetJson({
     client: cocinaClient,
     path: '/kds/history',
-    params: {
-      status,
-      startDate,
-    },
+    params,
     requestId,
   });
 }
