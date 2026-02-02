@@ -53,12 +53,12 @@ Run (mapea 8005):
 
 ```bash
 docker run --rm -p 8005:8005 \
-	-e PORT=8005 \
-	-e DP_URL=https://delivery.irissoftware.lat/ \
-	-e ATC_URL=https://charlotte-atencion-cliente.onrender.com/ \
-	-e COCINA_URL=https://charlotte-cocina.onrender.com/ \
-	-e SEGURIDAD_URL=https://charlotte-seguridad.onrender.com/ \
-	charlotte-kpi:latest
+  -e PORT=8005 \
+  -e DP_URL=https://delivery.irissoftware.lat/ \
+  -e ATC_URL=https://charlotte-atencion-cliente.onrender.com/ \
+  -e COCINA_URL=https://charlotte-cocina.onrender.com/ \
+  -e SEGURIDAD_URL=https://charlotte-seguridad.onrender.com/ \
+  charlotte-kpi:latest
 ```
 
 ## Endpoints (KPI & Analytics)

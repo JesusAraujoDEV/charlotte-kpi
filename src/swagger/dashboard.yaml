@@ -1,0 +1,65 @@
+tags:
+  - name: Executive Dashboard
+    description: Vista consolidada para gerencia.
+
+paths:
+  /dashboard/overview:
+    get:
+      summary: 7.1 Executive Dashboard (Endpoint Maestro)
+      tags: [Executive Dashboard]
+      description: Vista consolidada de métricas críticas para la gerencia.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  warnings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        module:
+                          type: string
+                          example: atc_clients_active
+                        status:
+                          type: integer
+                          example: 0
+                        message:
+                          type: string
+                          example: Upstream request failed
+                  financial_summary:
+                    type: object
+                    properties:
+                      daily_revenue:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          delivery:
+                            type: number
+                          dine_in:
+                            type: number
+                      average_ticket:
+                        type: number
+                  operational_health:
+                    type: object
+                    properties:
+                      kitchen_load:
+                        type: string
+                        example: HIGH
+                      active_delivery_orders:
+                        type: integer
+                      ghost_clients_warning:
+                        type: integer
+                  critical_alerts:
+                    type: object
+                    properties:
+                      low_stock_items:
+                        type: array
+                        items:
+                          type: string
+                      delivery_delays:
+                        type: integer

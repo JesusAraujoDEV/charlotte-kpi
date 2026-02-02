@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: Charlotte KPI & Analytics API
+  version: 1.0.0
+  description: Motor de Inteligencia de Negocios (BI) que agrega datos de Delivery, Cocina, ATC y Seguridad.
+  contact:
+    name: Equipo de Desarrollo Charlotte
+    email: dev@charlotte.com
+servers:
+  - url: http://localhost:8005/api/kpi/v1
+    description: Servidor de Desarrollo
+  - url: https://kpi.irissoftware.lat/api/kpi/v1
+    description: Servidor de Producción
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths: {}

@@ -1,0 +1,79 @@
+tags:
+  - name: Experiencia del Cliente
+    description: Atención en sala y ocupación.
+
+paths:
+  /cx/service-quality:
+    get:
+      summary: 5.1 Calidad de Servicio (Tiempos de Respuesta)
+      tags: [Experiencia del Cliente]
+      description: Tiempo promedio de atención a solicitudes en mesa.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service_quality:
+                    type: object
+                    properties:
+                      avg_response_minutes:
+                        type: number
+                        example: 2.5
+                      pending_calls:
+                        type: integer
+                        example: 1
+  /cx/room-occupancy:
+    get:
+      summary: 5.2 Ocupación de Sala
+      tags: [Experiencia del Cliente]
+      description: Porcentaje de mesas ocupadas en tiempo real.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  room_occupancy:
+                    type: object
+                    properties:
+                      percentage:
+                        type: number
+                        example: 75.0
+                      occupied:
+                        type: integer
+                        example: 15
+                      total:
+                        type: integer
+                        example: 20
+  /cx/ghost-clients:
+    get:
+      summary: 5.3 Detección de Clientes Fantasma
+      tags: [Experiencia del Cliente]
+      description: Mesas ocupadas sin actividad reciente.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ghost_clients:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        example: 2
+                      clients:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table_id:
+                              type: integer
+                              example: 5

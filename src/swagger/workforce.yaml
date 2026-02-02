@@ -1,0 +1,30 @@
+tags:
+  - name: Gestión de Personal
+    description: Balance de carga operativa.
+
+paths:
+  /workforce/orders-per-chef:
+    get:
+      summary: 6.1 Personal Activo vs. Demanda
+      tags: [Gestión de Personal]
+      description: Ratio de órdenes activas por cocinero disponible.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders_per_chef:
+                    type: object
+                    properties:
+                      ratio:
+                        type: number
+                        example: 4.5
+                      chefs:
+                        type: integer
+                        example: 3
+                      tasks:
+                        type: integer
+                        example: 14

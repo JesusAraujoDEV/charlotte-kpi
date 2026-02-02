@@ -1,0 +1,91 @@
+tags:
+  - name: Eficiencia Operativa
+    description: Métricas de velocidad y alertas.
+
+paths:
+  /operations/kitchen-velocity:
+    get:
+      summary: 2.1 Tiempo Promedio de Preparación
+      tags: [Eficiencia Operativa]
+      description: Promedio de tiempo desde que entra una orden a pantalla hasta que sale.
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            example: 2026-02-01
+          description: Fecha opcional (YYYY-MM-DD).
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kitchen_velocity:
+                    type: object
+                    properties:
+                      avg_minutes:
+                        type: number
+                        example: 14.5
+                      avg_ms:
+                        type: number
+                        example: 870000
+  /operations/delivery-success-rate:
+    get:
+      summary: 2.2 Tasa de Cumplimiento de Delivery
+      tags: [Eficiencia Operativa]
+      description: Porcentaje de órdenes entregadas vs total creadas.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delivery_success_rate:
+                    type: object
+                    properties:
+                      percentage:
+                        type: number
+                        example: 95.5
+                      delivered:
+                        type: integer
+                        example: 120
+                      total:
+                        type: integer
+                        example: 126
+  /operations/critical-alerts:
+    get:
+      summary: 2.3 Monitor de Alertas Críticas
+      tags: [Eficiencia Operativa]
+      description: Listado de órdenes que han excedido umbrales de tiempo.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  critical_alerts:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        example: 3
+                      alerts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            alert_id:
+                              type: string
+                            severity:
+                              type: string
+                              example: high
+                            message:
+                              type: string
+                              example: Orden DL-4409 excedió tiempo en cocina

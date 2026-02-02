@@ -1,0 +1,73 @@
+tags:
+  - name: Inteligencia de Producto
+    description: Métricas sobre productos y menú.
+
+paths:
+  /product/top-sellers:
+    get:
+      summary: 3.1 Ranking de Platos (Top Sellers)
+      tags: [Inteligencia de Producto]
+      description: Productos más vendidos basados en el historial del KDS.
+      parameters:
+        - in: query
+          name: top
+          schema:
+            type: integer
+            example: 10
+          description: Cantidad de resultados.
+        - in: query
+          name: date
+          schema:
+            type: string
+            example: 2026-02-01
+          description: Fecha opcional (YYYY-MM-DD) para el inicio de semana.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  top_sellers:
+                    type: object
+                    properties:
+                      top:
+                        type: integer
+                        example: 10
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: Hamburguesa Clásica
+                            count:
+                              type: integer
+                              example: 150
+  /product/menu-availability:
+    get:
+      summary: 3.2 Análisis de Disponibilidad de Menú
+      tags: [Inteligencia de Producto]
+      description: Porcentaje del catálogo disponible para venta.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  menu_availability:
+                    type: object
+                    properties:
+                      availability_percentage:
+                        type: number
+                        example: 85.0
+                      active:
+                        type: integer
+                        example: 95
+                      total:
+                        type: integer
+                        example: 112

@@ -1,0 +1,78 @@
+tags:
+  - name: Control de Inventario
+    description: Stock crítico y mermas.
+
+paths:
+  /inventory/low-stock:
+    get:
+      summary: 4.1 Semáforo de Stock Crítico
+      tags: [Control de Inventario]
+      description: Items de inventario por debajo del nivel mínimo.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  low_stock:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        example: 2
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: Tomate
+                            currentStock:
+                              type: number
+                              example: 2.5
+                            minStock:
+                              type: number
+                              example: 5
+  /inventory/waste-tracker:
+    get:
+      summary: 4.2 Monitor de Mermas
+      tags: [Control de Inventario]
+      description: Registro de inventario perdido por desperdicio (muestreo por item).
+      parameters:
+        - in: query
+          name: limitItems
+          schema:
+            type: integer
+            example: 10
+          description: Número de items a muestrear.
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  waste_tracker:
+                    type: object
+                    properties:
+                      sampled_items_count:
+                        type: integer
+                        example: 10
+                      total_logs_count:
+                        type: integer
+                        example: 42
+                      sampled_items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: Lechuga
+                            logs_count:
+                              type: integer
+                              example: 3
