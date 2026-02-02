@@ -36,6 +36,21 @@ function buildSpec() {
     }
   }
 
+  const swaggerBase = String(process.env.SWAGGER_URL || '').trim();
+  if (swaggerBase) {
+    const normalized = swaggerBase.replace(/\/+$/, '');
+    base.servers = base.servers || [];
+    const devServer = {
+      url: `${normalized}/api/kpi/v1`,
+      description: 'Servidor de Desarrollo (env)'
+    };
+
+    const prodServer = (base.servers || []).find((s) => String(s.url || '').includes('kpi.irissoftware.lat'))
+      || { url: 'https://kpi.irissoftware.lat/api/kpi/v1', description: 'Servidor de Producción' };
+
+    base.servers = [devServer, prodServer];
+  }
+
   return base;
 }
 

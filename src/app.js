@@ -5,6 +5,7 @@ const morgan = require('morgan');
 
 const { kpiRouter } = require('./routes/kpi.routes');
 const setupSwagger = require('./swagger/swagger');
+const { requestOriginLogger } = require('./middleware/requestOriginLogger');
 
 function createApp() {
   const app = express();
@@ -14,6 +15,8 @@ function createApp() {
   app.use(helmet());
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
+
+  app.use(requestOriginLogger);
 
   app.use((req, res, next) => {
     const reqId = req.header('x-request-id') || `req_${Date.now()}_${Math.random().toString(16).slice(2)}`;
