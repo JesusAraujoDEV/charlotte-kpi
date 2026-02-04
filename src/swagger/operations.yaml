@@ -36,7 +36,14 @@ paths:
     get:
       summary: 2.2 Tasa de Cumplimiento de Delivery
       tags: [Eficiencia Operativa]
-      description: Porcentaje de órdenes entregadas vs total creadas.
+      description: Porcentaje de órdenes entregadas vs total creadas. Si se envía date, se calcula solo para ese día.
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            example: 2026-02-01
+          description: Fecha opcional (YYYY-MM-DD). Si se envía, calcula la tasa del día.
       responses:
         200:
           description: Éxito
@@ -45,6 +52,9 @@ paths:
               schema:
                 type: object
                 properties:
+                  date:
+                    type: string
+                    example: 2026-02-01
                   delivery_success_rate:
                     type: object
                     properties:
