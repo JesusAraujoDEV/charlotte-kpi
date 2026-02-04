@@ -1,7 +1,7 @@
 const { config } = require('../config');
 const cocina = require('../services/cocina.service');
 const { fetchJsonCached } = require('../lib/fetchWithCache');
-const { getWeekStartIso } = require('../lib/dates');
+const { getDayRangeIso, getWeekStartIso } = require('../lib/dates');
 const { asArray } = require('../lib/extract');
 
 function extractProductNamesFromTask(task) {
@@ -25,7 +25,10 @@ const productController = {
   async topSellers(req, res, next) {
     try {
       const top = Number(req.query.top || 10);
-      const { startIso } = getWeekStartIso({ timezone: config.timezone, date: req.query.date });
+      const date = req.query.date;
+      const { startIso } = date
+        ? getDayRangeIso({ timezone: config.timezone, date })
+        : getWeekStartIso({ timezone: config.timezone, date });
 
       console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/history?startDate=${startIso}`);
 
