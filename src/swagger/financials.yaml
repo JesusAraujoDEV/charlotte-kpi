@@ -106,88 +106,88 @@ paths:
                       kitchen_rejected_estimated:
                         type: number
                         example: 50.0
-      /financial/revenue-series:
-        get:
-          summary: 1.4 Historial de Ingresos (Revenue Series)
-          tags: [Finanzas Épicas]
-          description: Retorna ingresos históricos agrupados por día o mes.
-          parameters:
-            - in: query
-              name: from
+  /financial/revenue-series:
+    get:
+      summary: 1.4 Historial de Ingresos (Revenue Series)
+      tags: [Finanzas Épicas]
+      description: Retorna ingresos históricos agrupados por día o mes.
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+            example: 2026-02-01
+          description: Fecha inicio (YYYY-MM-DD).
+          required: true
+        - in: query
+          name: to
+          schema:
+            type: string
+            example: 2026-02-07
+          description: Fecha fin (YYYY-MM-DD).
+          required: true
+        - in: query
+          name: groupBy
+          schema:
+            type: string
+            example: day
+          description: day (por día) o month (por mes).
+          required: true
+      responses:
+        200:
+          description: Éxito
+          content:
+            application/json:
               schema:
-                type: string
-                example: 2026-02-01
-              description: Fecha inicio (YYYY-MM-DD).
-              required: true
-            - in: query
-              name: to
-              schema:
-                type: string
-                example: 2026-02-07
-              description: Fecha fin (YYYY-MM-DD).
-              required: true
-            - in: query
-              name: groupBy
-              schema:
-                type: string
-                example: day
-              description: day (por día) o month (por mes).
-              required: true
-          responses:
-            200:
-              description: Éxito
-              content:
-                application/json:
-                  schema:
+                type: object
+                properties:
+                  series:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label:
+                          type: string
+                          example: 2026-02-01
+                        delivery:
+                          type: number
+                          example: 120.5
+                        dine_in:
+                          type: number
+                          example: 85.0
+                        total:
+                          type: number
+                          example: 205.5
+                  summary:
                     type: object
                     properties:
-                      series:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            label:
-                              type: string
-                              example: 2026-02-01
-                            delivery:
-                              type: number
-                              example: 120.5
-                            dine_in:
-                              type: number
-                              example: 85.0
-                            total:
-                              type: number
-                              example: 205.5
-                      summary:
+                      total_period:
+                        type: number
+                        example: 2306.75
+                      best_day:
+                        type: string
+                        example: 2026-02-07
+                      avg_daily:
+                        type: number
+                        example: 329.53
+                  sources:
+                    type: object
+                    properties:
+                      dp:
                         type: object
                         properties:
-                          total_period:
-                            type: number
-                            example: 2306.75
-                          best_day:
+                          ok:
+                            type: boolean
+                          status:
+                            type: integer
+                          cache:
                             type: string
-                            example: 2026-02-07
-                          avg_daily:
-                            type: number
-                            example: 329.53
-                      sources:
+                      atc:
                         type: object
                         properties:
-                          dp:
-                            type: object
-                            properties:
-                              ok:
-                                type: boolean
-                              status:
-                                type: integer
-                              cache:
-                                type: string
-                          atc:
-                            type: object
-                            properties:
-                              ok:
-                                type: boolean
-                              status:
-                                type: integer
-                              cache:
-                                type: string
+                          ok:
+                            type: boolean
+                          status:
+                            type: integer
+                          cache:
+                            type: string
