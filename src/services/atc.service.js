@@ -43,9 +43,41 @@ async function getActiveClients({ requestId }) {
   });
 }
 
+async function getRatingsSummary({ waiterId, from, to, requestId }) {
+  const params = {};
+  if (waiterId) params.waiter_id = waiterId;
+  if (from) params.from = from;
+  if (to) params.to = to;
+
+  return httpGetJson({
+    client: atcClient,
+    path: '/api/v1/atencion-cliente/ratings/summary',
+    params,
+    requestId,
+  });
+}
+
+async function getRatingsByWaiter({ granularity, page, pageSize, from, to, requestId }) {
+  const params = {};
+  if (granularity) params.granularity = granularity;
+  if (page) params.page = page;
+  if (pageSize) params.page_size = pageSize;
+  if (from) params.from = from;
+  if (to) params.to = to;
+
+  return httpGetJson({
+    client: atcClient,
+    path: '/api/v1/atencion-cliente/ratings/by-waiter',
+    params,
+    requestId,
+  });
+}
+
 module.exports = {
   getClosedClients,
   getServiceRequests,
   getTables,
   getActiveClients,
+  getRatingsSummary,
+  getRatingsByWaiter,
 };

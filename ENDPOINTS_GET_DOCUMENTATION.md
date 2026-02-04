@@ -949,13 +949,110 @@ GET /api/kpi/v1/cx/ghost-clients
 
 ---
 
+### 14. Índice de Satisfacción (CSAT)
+
+#### `GET /api/kpi/v1/cx/satisfaction-score`
+
+**Propósito:** Retorna el promedio de calificaciones y la distribución de puntajes (0–5).
+
+**Características:**
+- ✅ Consulta resumen de ratings desde Atención al Cliente
+- ✅ Soporta consulta por fecha específica o rango (`from`/`to`)
+- ✅ Caché de 5 segundos
+
+#### 📊 Parámetros (Query String)
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `date` |
+| **Valores permitidos** | `YYYY-MM-DD` |
+| **Valor por defecto** | (sin valor) |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `from` |
+| **Valores permitidos** | ISO DateTime |
+| **Valor por defecto** | (sin valor) |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `to` |
+| **Valores permitidos** | ISO DateTime |
+| **Valor por defecto** | (sin valor) |
+
+**Descripción:**
+- Si se envía `date`, el KPI convierte esa fecha a rango completo del día.
+- Si se envían `from` y/o `to`, se usan directamente en el resumen.
+
+**Ejemplos:**
+
+```javascript
+// Resumen global
+GET /api/kpi/v1/cx/satisfaction-score
+
+// Resumen de un día específico
+GET /api/kpi/v1/cx/satisfaction-score?date=2026-01-31
+
+// Resumen por rango
+GET /api/kpi/v1/cx/satisfaction-score?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z
+```
+
+#### 📤 Formato de Respuesta
+
+```json
+{
+  "date_range": {
+    "start": "2026-01-31T00:00:00.000Z",
+    "end": "2026-01-31T23:59:59.999Z"
+  },
+  "satisfaction_score": {
+    "count": 42,
+    "average": 4.2,
+    "distribution": {
+      "0": 0,
+      "1": 1,
+      "2": 3,
+      "3": 8,
+      "4": 15,
+      "5": 15
+    }
+  },
+  "sources": {
+    "atc": {
+      "ok": true,
+      "status": 200,
+      "cache": "HIT"
+    }
+  }
+}
+```
+
+**Descripción de Campos:**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `satisfaction_score.count` | number | Total de calificaciones consideradas |
+| `satisfaction_score.average` | number | Promedio global de calificaciones |
+| `satisfaction_score.distribution` | object | Conteo por puntaje (0–5) |
+
+---
+
 ## 👨‍🍳 Módulo: Workforce (Personal)
 
 Endpoints relacionados con métricas de personal y carga laboral.
 
 ---
 
-### 14. Órdenes por Chef
+### 15. Órdenes por Chef
 
 #### `GET /api/kpi/v1/workforce/orders-per-chef`
 
@@ -976,6 +1073,103 @@ Endpoints relacionados con métricas de personal y carga laboral.
 
 ```javascript
 GET /api/kpi/v1/workforce/orders-per-chef
+```
+
+---
+
+### 16. Ranking de Desempeño de Meseros
+
+#### `GET /api/kpi/v1/workforce/waiter-ranking`
+
+**Propósito:** Lista de meseros ordenados por calificación promedio.
+
+**Características:**
+- ✅ Consulta calificaciones agrupadas por mesero (ATC)
+- ✅ Ordena descendente por promedio
+- ✅ Caché de 5 segundos
+
+#### 📊 Parámetros (Query String)
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `date` |
+| **Valores permitidos** | `YYYY-MM-DD` |
+| **Valor por defecto** | (sin valor) |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `from` |
+| **Valores permitidos** | ISO DateTime |
+| **Valor por defecto** | (sin valor) |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `to` |
+| **Valores permitidos** | ISO DateTime |
+| **Valor por defecto** | (sin valor) |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `int` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `page` |
+| **Valor por defecto** | `1` |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `int` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ❌ No (opcional) |
+| **Nombre** | `page_size` |
+| **Valor por defecto** | `50` |
+
+**Ejemplos:**
+
+```javascript
+GET /api/kpi/v1/workforce/waiter-ranking?date=2026-01-31
+
+GET /api/kpi/v1/workforce/waiter-ranking?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z&page=1&page_size=50
+```
+
+#### 📤 Formato de Respuesta
+
+```json
+{
+  "date_range": {
+    "start": "2026-01-31T00:00:00.000Z",
+    "end": "2026-01-31T23:59:59.999Z"
+  },
+  "waiter_ranking": {
+    "page": 1,
+    "page_size": 50,
+    "total_waiters": 25,
+    "items": [
+      {
+        "waiter_id": "b3f9f5f0-1a2b-4c3d-8e9f-0123456789ab",
+        "name": "Juan Pérez",
+        "average": 4.5,
+        "total_reviews": 12
+      }
+    ]
+  },
+  "sources": {
+    "atc": {
+      "ok": true,
+      "status": 200,
+      "cache": "MISS"
+    }
+  }
+}
 ```
 
 #### 📤 Formato de Respuesta

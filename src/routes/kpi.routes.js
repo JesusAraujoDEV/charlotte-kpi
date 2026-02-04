@@ -39,8 +39,10 @@ kpiRouter.get('/inventory/waste-tracker', cacheResponse({ ttlMs: TTL.inventory }
 kpiRouter.get('/cx/service-quality', cacheResponse({ ttlMs: TTL.cx }), cxController.serviceQuality);
 kpiRouter.get('/cx/room-occupancy', cacheResponse({ ttlMs: TTL.cx }), cxController.roomOccupancy);
 kpiRouter.get('/cx/ghost-clients', cacheResponse({ ttlMs: TTL.cx }), cxController.ghostClients);
+kpiRouter.get('/cx/satisfaction-score', cacheResponse({ ttlMs: TTL.cx }), cxController.satisfactionScore);
 
 kpiRouter.get('/workforce/orders-per-chef', cacheResponse({ ttlMs: TTL.workforce }), workforceController.ordersPerChef);
+kpiRouter.get('/workforce/waiter-ranking', cacheResponse({ ttlMs: TTL.workforce }), workforceController.waiterRanking);
 
 kpiRouter.get('/dashboard/overview', cacheResponse({ ttlMs: TTL.overview }), dashboardController.overview);
 

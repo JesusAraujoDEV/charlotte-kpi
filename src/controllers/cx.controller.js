@@ -2,7 +2,7 @@ const { config } = require('../config');
 const atc = require('../services/atc.service');
 const { fetchJsonCached } = require('../lib/fetchWithCache');
 const { asArray } = require('../lib/extract');
-const { durationMs } = require('../lib/dates');
+const { durationMs, getDayRangeIso } = require('../lib/dates');
 
 function avg(values) {
   const arr = values.filter((v) => typeof v === 'number' && Number.isFinite(v));
@@ -125,6 +125,55 @@ const cxController = {
         },
         sources: {
           atc: { ok: r.ok, status: r.status, cache: r.cache },
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async satisfactionScore(req, res, next) {
+    try {
+      const date = req.query.date;
+      const from = req.query.from;
+      const to = req.query.to;
+
+      const range = date ? getDayRangeIso({ timezone: config.timezone, date }) : null;
+      const fromIso = range ? range.startIso : from;
+      const toIso = range ? range.endIso : to;
+
+      const qs = [
+        fromIso ? `from=${encodeURIComponent(fromIso)}` : null,
+        toIso ? `to=${encodeURIComponent(toIso)}` : null,
+      ].filter(Boolean).join('&');
+
+      console.log(
+        `ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/ratings/summary${qs ? `?${qs}` : ''}`
+      );
+
+      const summary = await fetchJsonCached({
+        baseURL: config.atcBaseUrl,
+        path: 'api/v1/atencion-cliente/ratings/summary',
+        params: {
+          ...(fromIso ? { from: fromIso } : {}),
+          ...(toIso ? { to: toIso } : {}),
+        },
+        requestId: req.id,
+        ttlMs: 5_000,
+        fetcher: ({ requestId }) => atc.getRatingsSummary({ from: fromIso, to: toIso, requestId }),
+      });
+
+      const payload = summary.data || {};
+
+      res.json({
+        date_range: range ? { start: range.startIso, end: range.endIso } : undefined,
+        satisfaction_score: {
+          count: payload?.data?.count ?? payload?.count ?? 0,
+          average: payload?.data?.average ?? payload?.average ?? 0,
+          distribution: payload?.data?.distribution ?? payload?.distribution ?? { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        },
+        sources: {
+          atc: { ok: summary.ok, status: summary.status, cache: summary.cache },
         },
       });
     } catch (err) {
