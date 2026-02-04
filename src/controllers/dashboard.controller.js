@@ -57,14 +57,21 @@ const dashboardController = {
       const date = req.query.date;
       const { startIso, endIso } = getDayRangeIso({ timezone: config.timezone, date });
 
+      const dpDate = date || 'today';
+      const useKitchenHistory = Boolean(date);
+
       const warnings = [];
 
-      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${date || 'today'}`);
-      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients?status=CLOSED&date_from=${startIso}&date_to=${endIso}`);
-      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/queue`);
-      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders/active`);
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${encodeURIComponent(dpDate)}`);
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients?status=CLOSED&date_from=${encodeURIComponent(startIso)}&date_to=${encodeURIComponent(endIso)}`);
+      if (useKitchenHistory) {
+        console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/history?status=PENDING&startDate=${encodeURIComponent(startIso)}`);
+      } else {
+        console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/queue?status=PENDING`);
+      }
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders/active${date ? `?date=${encodeURIComponent(dpDate)}` : ''}`);
       console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients/active`);
-      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/inventory/items`);
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/inventory/items?stockStatus=LOW`);
       console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/alerts`);
 
       const [dpDelivered, atcClosed, queuePending, dpActive, atcActiveClients, lowStock, dpAlerts] = await Promise.all([
@@ -73,10 +80,10 @@ const dashboardController = {
           fetchJsonCached({
             baseURL: config.dpBaseUrl,
             path: '/api/dp/v1/orders',
-            params: { status: 'DELIVERED', date: date || 'today' },
+            params: { status: 'DELIVERED', date: dpDate },
             requestId: req.id,
             ttlMs: 5_000,
-            fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: date || 'today', requestId }),
+            fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: dpDate, requestId }),
           }),
           warnings
         ),
@@ -96,11 +103,14 @@ const dashboardController = {
           'cocina_queue_pending',
           fetchJsonCached({
             baseURL: config.cocinaBaseUrl,
-            path: '/kds/queue',
-            params: { status: 'PENDING' },
+            path: useKitchenHistory ? '/kds/history' : '/kds/queue',
+            params: useKitchenHistory ? { status: 'PENDING', startDate: startIso } : { status: 'PENDING' },
             requestId: req.id,
             ttlMs: 5_000,
-            fetcher: ({ requestId }) => cocina.getKdsQueue({ status: 'PENDING', requestId }),
+            fetcher: ({ requestId }) =>
+              useKitchenHistory
+                ? cocina.getKdsHistory({ status: 'PENDING', startDate: startIso, requestId })
+                : cocina.getKdsQueue({ status: 'PENDING', requestId }),
           }),
           warnings
         ),
@@ -109,10 +119,10 @@ const dashboardController = {
           fetchJsonCached({
             baseURL: config.dpBaseUrl,
             path: '/api/dp/v1/orders/active',
-            params: {},
+            params: date ? { date: dpDate } : {},
             requestId: req.id,
             ttlMs: 5_000,
-            fetcher: ({ requestId }) => dp.getActiveOrders({ requestId }),
+            fetcher: ({ requestId }) => dp.getActiveOrders({ date: date ? dpDate : undefined, requestId }),
           }),
           warnings
         ),

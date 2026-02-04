@@ -1,8 +1,11 @@
 const { DateTime } = require('luxon');
 
 function getDayRangeIso({ timezone, date }) {
-  const base = date
-    ? DateTime.fromISO(date, { zone: timezone })
+  const normalizedDate = typeof date === 'string' && date.toLowerCase() === 'today' ? undefined : date;
+
+  const parsed = normalizedDate ? DateTime.fromISO(normalizedDate, { zone: timezone }) : null;
+  const base = parsed && parsed.isValid
+    ? parsed
     : DateTime.now().setZone(timezone);
 
   const start = base.startOf('day');

@@ -8,6 +8,13 @@ paths:
       summary: 7.1 Executive Dashboard (Endpoint Maestro)
       tags: [Executive Dashboard]
       description: Vista consolidada de métricas críticas para la gerencia.
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            example: 2026-02-01
+          description: Fecha (YYYY-MM-DD) o `today` para filtrar métricas por día.
       responses:
         200:
           description: Éxito

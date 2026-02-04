@@ -34,11 +34,14 @@ async function getAlerts({ requestId }) {
   });
 }
 
-async function getActiveOrders({ requestId }) {
+async function getActiveOrders({ date, requestId }) {
+  const params = {};
+  if (date) params.date = date;
+
   return httpGetJson({
     client: dpClient,
     path: '/api/dp/v1/orders/active',
-    params: {},
+    params,
     requestId,
   });
 }

@@ -1222,7 +1222,9 @@ Endpoint consolidado con métricas generales del sistema.
 | **Valores permitidos** | `today`, `YYYY-MM-DD` |
 | **Valor por defecto** | `today` |
 
-**Descripción:** Filtra datos financieros por fecha específica.
+**Descripción:**
+- Con `date` se filtran ingresos (DP delivered + ATC closed) y el conteo de cola de cocina (usa histórico del día).
+- El resto de métricas (órdenes activas, clientes activos, low stock y alerts) son “realtime”.
 
 **Ejemplos:**
 
