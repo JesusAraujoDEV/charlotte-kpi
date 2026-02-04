@@ -12,6 +12,10 @@ function countChefs(staff) {
 const workforceController = {
   async ordersPerChef(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/staff/active`);
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/queue?status=PENDING`);
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/queue?status=COOKING`);
+
       const [staff, pending, cooking] = await Promise.all([
         fetchJsonCached({
           baseURL: config.cocinaBaseUrl,

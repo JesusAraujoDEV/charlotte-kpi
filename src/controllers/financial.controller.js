@@ -52,6 +52,9 @@ const financialController = {
       const date = req.query.date; // optional ISO date (YYYY-MM-DD) or 'today'
       const { startIso, endIso } = getDayRangeIso({ timezone: config.timezone, date });
 
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${date || 'today'}`);
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients?status=CLOSED&date_from=${startIso}&date_to=${endIso}`);
+
       const [dpDelivered, atcClosed] = await Promise.all([
         fetchJsonCached({
           baseURL: config.dpBaseUrl,
@@ -99,6 +102,9 @@ const financialController = {
       const date = req.query.date;
       const { startIso, endIso } = getDayRangeIso({ timezone: config.timezone, date });
 
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${date || 'today'}`);
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients?status=CLOSED&date_from=${startIso}&date_to=${endIso}`);
+
       const [dpDelivered, atcClosed] = await Promise.all([
         fetchJsonCached({
           baseURL: config.dpBaseUrl,
@@ -145,6 +151,9 @@ const financialController = {
     try {
       const date = req.query.date;
       const { startIso } = getDayRangeIso({ timezone: config.timezone, date });
+
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=CANCELLED&date=${date || 'today'}`);
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/history?startDate=${startIso}`);
 
       const [dpCancelled, cocinaRejected] = await Promise.all([
         fetchJsonCached({

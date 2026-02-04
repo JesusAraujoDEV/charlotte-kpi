@@ -59,6 +59,14 @@ const dashboardController = {
 
       const warnings = [];
 
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${date || 'today'}`);
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients?status=CLOSED&date_from=${startIso}&date_to=${endIso}`);
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/queue`);
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders/active`);
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients/active`);
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/inventory/items`);
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/alerts`);
+
       const [dpDelivered, atcClosed, queuePending, dpActive, atcActiveClients, lowStock, dpAlerts] = await Promise.all([
         settle(
           'dp_orders_delivered',

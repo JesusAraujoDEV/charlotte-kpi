@@ -6,6 +6,8 @@ const { asArray } = require('../lib/extract');
 const inventoryController = {
   async lowStock(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/inventory/items?stockStatus=LOW`);
+
       const low = await fetchJsonCached({
         baseURL: config.cocinaBaseUrl,
         path: '/inventory/items',
@@ -39,6 +41,8 @@ const inventoryController = {
   async wasteTracker(req, res, next) {
     try {
       const limitItems = Math.min(50, Math.max(1, Number(req.query.limitItems || 10)));
+
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/inventory/items?stockStatus=LOW`);
 
       const low = await fetchJsonCached({
         baseURL: config.cocinaBaseUrl,

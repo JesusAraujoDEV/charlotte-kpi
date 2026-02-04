@@ -13,6 +13,8 @@ function avg(values) {
 const cxController = {
   async serviceQuality(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/service-requests`);
+
       const r = await fetchJsonCached({
         baseURL: config.atcBaseUrl,
         path: '/api/v1/atencion-cliente/service-requests',
@@ -52,6 +54,9 @@ const cxController = {
 
   async roomOccupancy(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/tables?status=OCCUPIED`);
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/tables`);
+
       const [occupied, total] = await Promise.all([
         fetchJsonCached({
           baseURL: config.atcBaseUrl,
@@ -95,6 +100,8 @@ const cxController = {
 
   async ghostClients(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients/active`);
+
       const r = await fetchJsonCached({
         baseURL: config.atcBaseUrl,
         path: '/api/v1/atencion-cliente/clients/active',

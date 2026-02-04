@@ -19,6 +19,8 @@ const operationsController = {
       const date = req.query.date;
       const { startIso } = getDayRangeIso({ timezone: config.timezone, date });
 
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/history?status=SERVED&startDate=${startIso}`);
+
       const served = await fetchJsonCached({
         baseURL: config.cocinaBaseUrl,
         path: '/kds/history',
@@ -56,6 +58,9 @@ const operationsController = {
       const date = req.query.date;
 
       if (date) {
+        console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${date}`);
+        console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?date=${date}`);
+
         const [deliveredResp, totalResp] = await Promise.all([
           fetchJsonCached({
             baseURL: config.dpBaseUrl,
@@ -96,6 +101,8 @@ const operationsController = {
 
         return;
       }
+
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/dashboard/orders`);
 
       const dash = await fetchJsonCached({
         baseURL: config.dpBaseUrl,
@@ -143,6 +150,8 @@ const operationsController = {
 
   async criticalAlerts(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/alerts`);
+
       const alerts = await fetchJsonCached({
         baseURL: config.dpBaseUrl,
         path: '/api/dp/v1/alerts',

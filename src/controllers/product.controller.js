@@ -27,6 +27,8 @@ const productController = {
       const top = Number(req.query.top || 10);
       const { startIso } = getWeekStartIso({ timezone: config.timezone, date: req.query.date });
 
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/kds/history?startDate=${startIso}`);
+
       const history = await fetchJsonCached({
         baseURL: config.cocinaBaseUrl,
         path: '/kds/history',
@@ -69,6 +71,8 @@ const productController = {
 
   async menuAvailability(req, res, next) {
     try {
+      console.log(`ejecutando... GET Del modulo de cocina ${config.cocinaBaseUrl}/products?activeOnly=false`);
+
       const products = await fetchJsonCached({
         baseURL: config.cocinaBaseUrl,
         path: '/products',
