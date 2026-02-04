@@ -95,7 +95,11 @@ paths:
                               type: string
                             severity:
                               type: string
-                              example: high
+                              example: critical
                             message:
                               type: string
+                              example: TIEMPO_MAXIMO_ESPERA_PENDIENTE: 6810 min > 5 min
+                            order:
+                              type: string
+                              example: DL-4717
                               example: Orden DL-4409 excedió tiempo en cocina

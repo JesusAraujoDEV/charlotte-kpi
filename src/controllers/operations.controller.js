@@ -153,18 +153,17 @@ const operationsController = {
       });
 
       const list = asArray(alerts.data);
-      const critical = list.filter((a) => {
-        const sev = String(a?.severity ?? a?.level ?? '').toLowerCase();
-        return sev === 'high' || sev === 'critical';
-      });
+      // DP alerts are all critical by definition (they exceed thresholds)
+      const critical = list.filter((a) => a?.minutes > (a?.threshold || 0));
 
       res.json({
         critical_alerts: {
           count: alerts.ok ? critical.length : 0,
           alerts: critical.map((a) => ({
-            alert_id: a?.alert_id ?? a?.id,
-            severity: a?.severity ?? a?.level,
-            message: a?.message ?? a?.title,
+            alert_id: a?.order_id ?? a?.alert_id ?? a?.id,
+            severity: 'critical', // All DP alerts are critical
+            message: `${a?.metric || 'Unknown'}: ${a?.minutes || 0} min > ${a?.threshold || 0} min`,
+            order: a?.readable_id,
           })),
         },
         sources: {
