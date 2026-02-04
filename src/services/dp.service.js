@@ -4,13 +4,14 @@ const { createHttpClient, httpGetJson } = require('../lib/http');
 const dpClient = createHttpClient({ baseURL: config.dpBaseUrl });
 
 async function getOrders({ status, date, requestId }) {
+  const params = {};
+  if (status) params.status = status;
+  if (date) params.date = date;
+
   return httpGetJson({
     client: dpClient,
     path: '/api/dp/v1/orders',
-    params: {
-      status,
-      date,
-    },
+    params,
     requestId,
   });
 }

@@ -28,4 +28,5 @@ const config = {
   seguridadBaseUrl: normalizeBaseUrl(process.env.SEGURIDAD_URL || ''),
 };
 
+console.log('[DEBUG] config:', config);
 module.exports = { config };

@@ -53,6 +53,50 @@ const operationsController = {
 
   async deliverySuccessRate(req, res, next) {
     try {
+      const date = req.query.date;
+
+      if (date) {
+        const [deliveredResp, totalResp] = await Promise.all([
+          fetchJsonCached({
+            baseURL: config.dpBaseUrl,
+            path: '/api/dp/v1/orders',
+            params: { status: 'DELIVERED', date },
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date, requestId }),
+          }),
+          fetchJsonCached({
+            baseURL: config.dpBaseUrl,
+            path: '/api/dp/v1/orders',
+            params: { date },
+            requestId: req.id,
+            ttlMs: 5_000,
+            fetcher: ({ requestId }) => dp.getOrders({ date, requestId }),
+          }),
+        ]);
+
+        const deliveredList = asArray(deliveredResp.data);
+        const totalList = asArray(totalResp.data);
+
+        const deliveredNum = deliveredResp.ok ? deliveredList.length : 0;
+        const totalNum = totalResp.ok ? totalList.length : 0;
+
+        res.json({
+          date,
+          delivery_success_rate: {
+            delivered: deliveredNum,
+            total: totalNum,
+            percentage: safeDiv(deliveredNum, totalNum) * 100,
+          },
+          sources: {
+            dp_delivered: { ok: deliveredResp.ok, status: deliveredResp.status, cache: deliveredResp.cache },
+            dp_total: { ok: totalResp.ok, status: totalResp.status, cache: totalResp.cache },
+          },
+        });
+
+        return;
+      }
+
       const dash = await fetchJsonCached({
         baseURL: config.dpBaseUrl,
         path: '/api/dp/v1/dashboard/orders',

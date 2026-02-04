@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const { kpiRouter } = require('./routes/kpi.routes');
 const setupSwagger = require('./swagger/swagger');
 const { requestOriginLogger } = require('./middleware/requestOriginLogger');
+const morgan = require('morgan');
 
 function createApp() {
   const app = express();
@@ -27,6 +28,8 @@ function createApp() {
   app.get('/healthz', (req, res) => {
     res.json({ ok: true, service: 'charlotte-kpi', time: new Date().toISOString() });
   });
+
+//   app.use(morgan('combined'));
 
   setupSwagger(app);
 
