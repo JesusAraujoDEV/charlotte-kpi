@@ -244,6 +244,92 @@ GET /api/kpi/v1/financial/lost-revenue?date=2026-01-29
 
 ---
 
+### 4. Historial de Ingresos (Revenue Series)
+
+#### `GET /api/kpi/v1/financial/revenue-series`
+
+**Propósito:** Retorna los ingresos históricos agrupados por día o mes, ideal para gráficos comparativos.
+
+**Características:**
+- ✅ Requiere rango de fechas (`from`, `to`)
+- ✅ Agrupa por `day` o `month`
+- ✅ Combina delivery (DP) y dine-in (ATC)
+- ✅ Caché de 60 segundos
+
+#### 📊 Parámetros (Query String)
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ✅ Sí |
+| **Nombre** | `from` |
+| **Valores permitidos** | `YYYY-MM-DD` |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ✅ Sí |
+| **Nombre** | `to` |
+| **Valores permitidos** | `YYYY-MM-DD` |
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | `string` |
+| **Ubicación** | Query parameter |
+| **Requerido** | ✅ Sí |
+| **Nombre** | `groupBy` |
+| **Valores permitidos** | `day`, `month` |
+
+**Ejemplos:**
+
+```javascript
+// Serie diaria
+GET /api/kpi/v1/financial/revenue-series?from=2026-02-01&to=2026-02-07&groupBy=day
+
+// Serie mensual
+GET /api/kpi/v1/financial/revenue-series?from=2026-01-01&to=2026-03-31&groupBy=month
+```
+
+#### 📤 Formato de Respuesta
+
+```json
+{
+  "series": [
+    {
+      "label": "2026-02-01",
+      "delivery": 120.5,
+      "dine_in": 85.0,
+      "total": 205.5
+    }
+  ],
+  "summary": {
+    "total_period": 2306.75,
+    "best_day": "2026-02-07",
+    "avg_daily": 329.53
+  },
+  "sources": {
+    "dp": { "ok": true, "status": 200, "cache": "MISS" },
+    "atc": { "ok": true, "status": 200, "cache": "MISS" }
+  }
+}
+```
+
+**Descripción de Campos:**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `series[].label` | string | Día (YYYY-MM-DD) o mes (YYYY-MM) |
+| `series[].delivery` | number | Ingresos delivery |
+| `series[].dine_in` | number | Ingresos dine-in |
+| `series[].total` | number | Suma delivery + dine-in |
+| `summary.total_period` | number | Suma total del período |
+| `summary.best_day` | string | Etiqueta con mejor resultado |
+| `summary.avg_daily` | number | Promedio por bucket (`day` o `month`) |
+
+---
+
 ## ⚙️ Módulo: Operations (Operaciones)
 
 Endpoints relacionados con métricas operacionales y eficiencia.

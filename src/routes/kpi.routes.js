@@ -25,6 +25,7 @@ const TTL = {
 kpiRouter.get('/financial/daily-revenue', cacheResponse({ ttlMs: TTL.financial }), financialController.dailyRevenue);
 kpiRouter.get('/financial/aov', cacheResponse({ ttlMs: TTL.financial }), financialController.aov);
 kpiRouter.get('/financial/lost-revenue', cacheResponse({ ttlMs: TTL.financial }), financialController.lostRevenue);
+kpiRouter.get('/financial/revenue-series', cacheResponse({ ttlMs: TTL.financial }), financialController.revenueSeries);
 
 kpiRouter.get('/operations/kitchen-velocity', cacheResponse({ ttlMs: TTL.operational }), operationsController.kitchenVelocity);
 kpiRouter.get('/operations/delivery-success-rate', cacheResponse({ ttlMs: TTL.operational }), operationsController.deliverySuccessRate);

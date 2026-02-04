@@ -1,4 +1,5 @@
 const { config } = require('../config');
+const { DateTime } = require('luxon');
 const dp = require('../services/dp.service');
 const atc = require('../services/atc.service');
 const cocina = require('../services/cocina.service');
@@ -44,6 +45,22 @@ function estimateKdsTaskValue(task) {
     const qty = toNumber(it?.quantity ?? it?.qty ?? 1) || 1;
     return acc + price * qty;
   }, 0);
+}
+
+function mergeSources(results) {
+  const list = results.filter(Boolean);
+  if (!list.length) return { ok: true, status: 200, cache: 'MISS' };
+
+  const ok = list.every((x) => x.ok);
+  const status = ok ? (list.find((x) => x?.status)?.status ?? 200) : (list.find((x) => !x.ok)?.status ?? 0);
+  const cacheValues = list.map((x) => x?.cache).filter(Boolean);
+  const cache = cacheValues.length
+    ? cacheValues.every((c) => c === cacheValues[0])
+      ? cacheValues[0]
+      : 'MIXED'
+    : undefined;
+
+  return { ok, status, cache };
 }
 
 const financialController = {
@@ -195,6 +212,127 @@ const financialController = {
         sources: {
           dp: { ok: dpCancelled.ok, status: dpCancelled.status, cache: dpCancelled.cache },
           cocina: { ok: cocinaRejected.ok, status: cocinaRejected.status, cache: cocinaRejected.cache },
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async revenueSeries(req, res, next) {
+    try {
+      const { from, to, groupBy } = req.query;
+      const group = String(groupBy || '').toLowerCase();
+
+      if (!from || !to || !groupBy) {
+        res.status(400).json({ error: 'Missing required query params: from, to, groupBy' });
+        return;
+      }
+
+      if (group !== 'day' && group !== 'month') {
+        res.status(400).json({ error: 'Invalid groupBy. Use "day" or "month".' });
+        return;
+      }
+
+      const start = DateTime.fromISO(from, { zone: config.timezone }).startOf('day');
+      const end = DateTime.fromISO(to, { zone: config.timezone }).startOf('day');
+
+      if (!start.isValid || !end.isValid) {
+        res.status(400).json({ error: 'Invalid from/to. Use YYYY-MM-DD.' });
+        return;
+      }
+
+      if (end < start) {
+        res.status(400).json({ error: '`to` must be on/after `from`.' });
+        return;
+      }
+
+      const days = [];
+      for (let cursor = start; cursor <= end; cursor = cursor.plus({ days: 1 })) {
+        days.push(cursor);
+      }
+
+      const dailyResults = await Promise.all(
+        days.map(async (day) => {
+          const dateStr = day.toISODate();
+          const { startIso, endIso } = getDayRangeIso({ timezone: config.timezone, date: dateStr });
+
+          console.log(`ejecutando... GET Del modulo de DP ${config.dpBaseUrl}/api/dp/v1/orders?status=DELIVERED&date=${dateStr}`);
+          console.log(`ejecutando... GET Del modulo de ATC ${config.atcBaseUrl}/api/v1/atencion-cliente/clients?status=CLOSED&date_from=${startIso}&date_to=${endIso}`);
+
+          const [dpDelivered, atcClosed] = await Promise.all([
+            fetchJsonCached({
+              baseURL: config.dpBaseUrl,
+              path: '/api/dp/v1/orders',
+              params: { status: 'DELIVERED', date: dateStr },
+              requestId: req.id,
+              ttlMs: 60_000,
+              fetcher: ({ requestId }) => dp.getOrders({ status: 'DELIVERED', date: dateStr, requestId }),
+            }),
+            fetchJsonCached({
+              baseURL: config.atcBaseUrl,
+              path: '/api/v1/atencion-cliente/clients',
+              params: { status: 'CLOSED', date_from: startIso, date_to: endIso },
+              requestId: req.id,
+              ttlMs: 60_000,
+              fetcher: ({ requestId }) => atc.getClosedClients({ dateFrom: startIso, dateTo: endIso, requestId }),
+            }),
+          ]);
+
+          const dpOrders = asArray(dpDelivered.data);
+          const atcClients = asArray(atcClosed.data);
+
+          const delivery = dpDelivered.ok ? sumOrderAmounts(dpOrders) : 0;
+          const dineIn = atcClosed.ok ? sumClientAmounts(atcClients) : 0;
+          const total = delivery + dineIn;
+
+          return {
+            label: dateStr,
+            delivery,
+            dine_in: dineIn,
+            total,
+            sources: { dp: dpDelivered, atc: atcClosed },
+          };
+        })
+      );
+
+      let series = dailyResults.map((r) => ({
+        label: r.label,
+        delivery: r.delivery,
+        dine_in: r.dine_in,
+        total: r.total,
+      }));
+
+      if (group === 'month') {
+        const monthMap = new Map();
+        dailyResults.forEach((r) => {
+          const label = DateTime.fromISO(r.label).toFormat('yyyy-LL');
+          const prev = monthMap.get(label) || { label, delivery: 0, dine_in: 0, total: 0 };
+          monthMap.set(label, {
+            label,
+            delivery: prev.delivery + r.delivery,
+            dine_in: prev.dine_in + r.dine_in,
+            total: prev.total + r.total,
+          });
+        });
+
+        series = Array.from(monthMap.values()).sort((a, b) => (a.label > b.label ? 1 : -1));
+      }
+
+      const totalPeriod = series.reduce((acc, s) => acc + s.total, 0);
+      const best = series.reduce((acc, s) => (s.total > acc.total ? s : acc), { label: null, total: 0 });
+      const avgDaily = series.length ? totalPeriod / series.length : 0;
+
+      res.json({
+        series,
+        summary: {
+          total_period: totalPeriod,
+          best_day: best.label,
+          avg_daily: avgDaily,
+        },
+        sources: {
+          dp: mergeSources(dailyResults.map((r) => r.sources.dp)),
+          atc: mergeSources(dailyResults.map((r) => r.sources.atc)),
         },
       });
     } catch (err) {
