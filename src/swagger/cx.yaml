@@ -84,12 +84,6 @@ paths:
       description: Promedio de calificaciones y distribución (0–5).
       parameters:
         - in: query
-          name: date
-          schema:
-            type: string
-            example: 2026-01-31
-          description: Fecha opcional (YYYY-MM-DD).
-        - in: query
           name: from
           schema:
             type: string

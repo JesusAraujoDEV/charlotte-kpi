@@ -134,13 +134,11 @@ const cxController = {
 
   async satisfactionScore(req, res, next) {
     try {
-      const date = req.query.date;
       const from = req.query.from;
       const to = req.query.to;
 
-      const range = date ? getDayRangeIso({ timezone: config.timezone, date }) : null;
-      const fromIso = range ? range.startIso : from;
-      const toIso = range ? range.endIso : to;
+      const fromIso = from;
+      const toIso = to;
 
       const qs = [
         fromIso ? `from=${encodeURIComponent(fromIso)}` : null,
@@ -166,7 +164,6 @@ const cxController = {
       const payload = summary.data || {};
 
       res.json({
-        date_range: range ? { start: range.startIso, end: range.endIso } : undefined,
         satisfaction_score: {
           count: payload?.data?.count ?? payload?.count ?? 0,
           average: payload?.data?.average ?? payload?.average ?? 0,

@@ -981,17 +981,13 @@ GET /api/kpi/v1/cx/ghost-clients
 | **Valor por defecto** | (sin valor) |
 
 **Descripción:**
-- Si se envía `date`, el KPI convierte esa fecha a rango completo del día.
-- Si se envían `from` y/o `to`, se usan directamente en el resumen.
+- Use `from` y `to` (ISO) para filtrar el resumen; si no se envían, se devuelve el resumen global.
 
 **Ejemplos:**
 
 ```javascript
 // Resumen global
 GET /api/kpi/v1/cx/satisfaction-score
-
-// Resumen de un día específico
-GET /api/kpi/v1/cx/satisfaction-score?date=2026-01-31
 
 // Resumen por rango
 GET /api/kpi/v1/cx/satisfaction-score?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z
@@ -1001,10 +997,6 @@ GET /api/kpi/v1/cx/satisfaction-score?from=2026-01-01T00:00:00.000Z&to=2026-01-3
 
 ```json
 {
-  "date_range": {
-    "start": "2026-01-31T00:00:00.000Z",
-    "end": "2026-01-31T23:59:59.999Z"
-  },
   "satisfaction_score": {
     "count": 42,
     "average": 4.2,
