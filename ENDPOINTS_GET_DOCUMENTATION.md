@@ -967,15 +967,6 @@ GET /api/kpi/v1/cx/ghost-clients
 | **Tipo** | `string` |
 | **Ubicación** | Query parameter |
 | **Requerido** | ❌ No (opcional) |
-| **Nombre** | `date` |
-| **Valores permitidos** | `YYYY-MM-DD` |
-| **Valor por defecto** | (sin valor) |
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Tipo** | `string` |
-| **Ubicación** | Query parameter |
-| **Requerido** | ❌ No (opcional) |
 | **Nombre** | `from` |
 | **Valores permitidos** | ISO DateTime |
 | **Valor por defecto** | (sin valor) |
@@ -1136,8 +1127,6 @@ GET /api/kpi/v1/workforce/orders-per-chef
 **Ejemplos:**
 
 ```javascript
-GET /api/kpi/v1/workforce/waiter-ranking?date=2026-01-31
-
 GET /api/kpi/v1/workforce/waiter-ranking?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z&page=1&page_size=50
 ```
 
@@ -1145,10 +1134,6 @@ GET /api/kpi/v1/workforce/waiter-ranking?from=2026-01-01T00:00:00.000Z&to=2026-0
 
 ```json
 {
-  "date_range": {
-    "start": "2026-01-31T00:00:00.000Z",
-    "end": "2026-01-31T23:59:59.999Z"
-  },
   "waiter_ranking": {
     "page": 1,
     "page_size": 50,

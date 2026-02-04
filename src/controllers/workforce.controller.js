@@ -4,7 +4,6 @@ const atc = require('../services/atc.service');
 const { fetchJsonCached } = require('../lib/fetchWithCache');
 const { asArray } = require('../lib/extract');
 const { safeDiv } = require('../lib/numbers');
-const { getDayRangeIso } = require('../lib/dates');
 
 function countChefs(staff) {
   const list = asArray(staff);
@@ -72,15 +71,13 @@ const workforceController = {
 
   async waiterRanking(req, res, next) {
     try {
-      const date = req.query.date;
       const from = req.query.from;
       const to = req.query.to;
       const pageSize = Math.min(100, Math.max(1, Number(req.query.page_size || 50)));
       const page = Math.max(1, Number(req.query.page || 1));
 
-      const range = date ? getDayRangeIso({ timezone: config.timezone, date }) : null;
-      const fromIso = range ? range.startIso : from;
-      const toIso = range ? range.endIso : to;
+      const fromIso = from;
+      const toIso = to;
 
       const qs = [
         'granularity=global',
@@ -128,7 +125,6 @@ const workforceController = {
         .sort((a, b) => b.average - a.average);
 
       res.json({
-        date_range: range ? { start: range.startIso, end: range.endIso } : undefined,
         waiter_ranking: {
           page,
           page_size: pageSize,
